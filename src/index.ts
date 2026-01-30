@@ -170,14 +170,17 @@ client.on(Events.InteractionCreate, async interaction => {
           const intro = await generateFlavorText(`Intro for Mafia game with players: ${Object.values(lobby.players).map((p:any) => p.username).join(', ')}.`);
           
           await interaction.update({ components: [] }); 
-          await interaction.channel?.send({ content: `**THE GAME BEGINS**\n*${intro}*\n(Ensure the Game Website is OPEN to process turns!)` });
+          
+          if (interaction.channel) {
+              await interaction.channel.send({ content: `**THE GAME BEGINS**\n*${intro}*\n(Ensure the Game Website is OPEN to process turns!)` });
+          }
 
           // Send Roles Privately
           for (const p of Object.values(initializedLobby.players) as Player[]) {
               try {
                 const user = await client.users.fetch(p.id);
-                // Fix: Send object instead of string
-                await user.send({ content: `**Your Role:** ${p.role?.toUpperCase()}\nObjective: ${p.role === 'mafia' ? 'Kill everyone.' : 'Find the Mafia.'}` });
+                const roleText = `**Your Role:** ${p.role?.toUpperCase()}\nObjective: ${p.role === 'mafia' ? 'Kill everyone.' : 'Find the Mafia.'}`;
+                await user.send({ content: roleText });
               } catch (e) {
                 console.error(`Could not DM ${p.username}`);
               }
@@ -268,8 +271,9 @@ client.on(Events.InteractionCreate, async interaction => {
           await update(ref(db, `discord_lobbies/${channelId}/game`), { discussionEvents: events });
 
           await interaction.reply({ content: `You accused <@${targetId}>.`, ephemeral: true });
-          // Fix: Send object instead of string
-          await interaction.channel?.send({ content: `<@${interaction.user.id}> points a finger at <@${targetId}>!` });
+          if (interaction.channel) {
+            await interaction.channel.send({ content: `<@${interaction.user.id}> points a finger at <@${targetId}>!` });
+          }
       }
 
       if (interaction.customId === 'target_vote') {
@@ -315,7 +319,6 @@ async function updateGameView(channel: TextChannel, lobby: LobbyData) {
                 for (const userId of log.visibleTo) {
                     try {
                         const user = await client.users.fetch(userId);
-                        // Fix: Send object instead of string
                         await user.send({ content: `**GAME INFO:** ${log.text}` });
                     } catch (e) {
                         // ignore
@@ -328,8 +331,8 @@ async function updateGameView(channel: TextChannel, lobby: LobbyData) {
         }
         
         if (publicLogs.length > 0) {
-            // Fix: Send object instead of string
-            await channel.send({ content: publicLogs.join('\n') });
+            const content = publicLogs.join('\n');
+            await channel.send({ content });
         }
         
         // Clear logs in Firebase so they don't resend on re-render/re-fetch
