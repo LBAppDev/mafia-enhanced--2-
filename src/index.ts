@@ -268,7 +268,8 @@ client.on(Events.InteractionCreate, async interaction => {
           await update(ref(db, `discord_lobbies/${channelId}/game`), { discussionEvents: events });
 
           await interaction.reply({ content: `You accused <@${targetId}>.`, ephemeral: true });
-          await interaction.channel?.send(`<@${interaction.user.id}> points a finger at <@${targetId}>!`);
+          // Fix: Send object instead of string
+          await interaction.channel?.send({ content: `<@${interaction.user.id}> points a finger at <@${targetId}>!` });
       }
 
       if (interaction.customId === 'target_vote') {
@@ -327,7 +328,8 @@ async function updateGameView(channel: TextChannel, lobby: LobbyData) {
         }
         
         if (publicLogs.length > 0) {
-            await channel.send(publicLogs.join('\n'));
+            // Fix: Send object instead of string
+            await channel.send({ content: publicLogs.join('\n') });
         }
         
         // Clear logs in Firebase so they don't resend on re-render/re-fetch
