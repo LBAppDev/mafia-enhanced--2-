@@ -3,6 +3,7 @@ import { Home } from './views/Home';
 import { Lobby } from './views/Lobby';
 import { ViewState } from './types';
 import { joinLobby } from './services/firebase';
+import { DiscordGameManager } from './components/DiscordGameManager';
 
 const getUserId = () => {
   try {
@@ -12,9 +13,7 @@ const getUserId = () => {
     localStorage.setItem('mafia_user_id', newId);
     return newId;
   } catch (e) {
-    // Explicitly log this error so it appears in the console for debugging
-    console.error("LocalStorage Access Error (Preview Mode Issue):", e);
-    // Fallback for environments where localStorage is blocked
+    console.error("LocalStorage Access Error:", e);
     return `user_${Math.random().toString(36).substr(2, 9)}`;
   }
 };
@@ -30,7 +29,6 @@ const App: React.FC = () => {
   const [lobbyCode, setLobbyCode] = useState<string>('');
   
   const [isTestMode, setIsTestMode] = useState(false);
-  // Initialize user ID safely
   const [users, setUsers] = useState<AppUser[]>(() => [{ id: getUserId(), name: 'You', isBot: false }]);
   const [activeUserIndex, setActiveUserIndex] = useState(0);
 
@@ -77,6 +75,9 @@ const App: React.FC = () => {
     <div className="h-screen w-screen bg-brand-dark text-slate-100 flex flex-col overflow-hidden font-sans">
        <div className="fixed inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-primary via-transparent to-transparent z-0"></div>
        
+       {/* THIS COMPONENT RUNS THE DISCORD GAME LOGIC IN THE BACKGROUND */}
+       <DiscordGameManager />
+
        {/* Minimal Top Bar */}
        <div className="absolute top-0 left-0 p-4 z-50 flex gap-2">
             {isTestMode && <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded font-bold uppercase shadow-lg shadow-red-500/20">Dev Mode</span>}

@@ -57,6 +57,7 @@ export interface GameState {
 
 export interface LobbyData {
   code: string;
+  channelId?: string;
   hostId: string;
   status: 'waiting' | 'in-game' | 'finished';
   players: Record<string, Player>;
