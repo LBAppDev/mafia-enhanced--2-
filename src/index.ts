@@ -176,7 +176,8 @@ client.on(Events.InteractionCreate, async interaction => {
           for (const p of Object.values(initializedLobby.players) as Player[]) {
               try {
                 const user = await client.users.fetch(p.id);
-                await user.send(`**Your Role:** ${p.role?.toUpperCase()}\nObjective: ${p.role === 'mafia' ? 'Kill everyone.' : 'Find the Mafia.'}`);
+                // Fix: Send object instead of string
+                await user.send({ content: `**Your Role:** ${p.role?.toUpperCase()}\nObjective: ${p.role === 'mafia' ? 'Kill everyone.' : 'Find the Mafia.'}` });
               } catch (e) {
                 console.error(`Could not DM ${p.username}`);
               }
@@ -313,7 +314,8 @@ async function updateGameView(channel: TextChannel, lobby: LobbyData) {
                 for (const userId of log.visibleTo) {
                     try {
                         const user = await client.users.fetch(userId);
-                        await user.send(`**GAME INFO:** ${log.text}`);
+                        // Fix: Send object instead of string
+                        await user.send({ content: `**GAME INFO:** ${log.text}` });
                     } catch (e) {
                         // ignore
                     }
